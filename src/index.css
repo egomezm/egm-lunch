@@ -332,7 +332,12 @@ summary:focus-visible {
   flex-wrap: wrap;
 }
 .session-head h1 {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  font-weight: 800;
+}
+.session-head .eyebrow,
+.session-head .muted {
+  font-size: 0.85rem;
 }
 .invite {
   position: relative;
@@ -694,7 +699,7 @@ summary:focus-visible {
   gap: 1.25rem;
 }
 .invite-banner .code {
-  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
   line-height: 1;
   color: var(--accent, inherit);
 }
@@ -703,4 +708,13 @@ summary:focus-visible {
     grid-template-columns: 1fr;
     justify-items: center;
   }
+}
+
+.invite-banner .qr svg {
+  width: 110px;
+  height: 110px;
+}
+.invite-banner .share-info input,
+.invite-banner .share-info .btn {
+  font-size: 0.8rem;
 }

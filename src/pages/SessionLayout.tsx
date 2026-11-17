@@ -97,9 +97,6 @@ export function SessionLayout() {
         refresh,
       }}
     >
-      <section className="card invite-banner rise" aria-label="Session code and invite">
-        <ShareCard code={session.code} />
-      </section>
       <header className="session-head rise">
         <div>
           <span className="eyebrow">Lunch session</span>
@@ -111,6 +108,9 @@ export function SessionLayout() {
           </p>
         </div>
       </header>
+      <section className="card invite-banner rise" aria-label="Session code and invite">
+        <ShareCard code={session.code} />
+      </section>
       <Countdown />
       <nav className="tabs" aria-label="Session steps">
         <NavLink to={{ pathname: '/options', search }}>1 · Options</NavLink>
