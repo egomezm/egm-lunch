@@ -15,7 +15,7 @@
   --ok: #1e8e5a;
   --shadow: 0 10px 30px -12px rgba(120, 60, 20, 0.25);
   --radius: 18px;
-  --pattern: rgba(120, 60, 20, 0.09);
+  --pattern: rgba(120, 60, 20, 0.05);
   font-family:
     'Inter',
     system-ui,
@@ -43,7 +43,7 @@
   --danger: #ff6b6b;
   --ok: #4cd194;
   --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
-  --pattern: rgba(255, 255, 255, 0.09);
+  --pattern: rgba(255, 255, 255, 0.05);
   color-scheme: dark;
 }
 
@@ -735,6 +735,6 @@ body::before {
   mask-image: url('./assets/food-pattern.svg');
   -webkit-mask-image: url('./assets/food-pattern.svg');
   mask-mode: luminance;
-  mask-size: 360px 360px;
-  -webkit-mask-size: 360px 360px;
+  mask-size: 720px 720px;
+  -webkit-mask-size: 720px 720px;
 }
