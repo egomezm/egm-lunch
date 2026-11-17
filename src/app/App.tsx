@@ -1,23 +1,24 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { HashRouter, Link, Route, Routes } from 'react-router-dom'
-import { Notes } from '../features/example/Notes'
-
-const queryClient = new QueryClient()
+import { HashRouter, Route, Routes } from 'react-router-dom'
+import { Landing } from '../pages/Landing'
+import { OptionsPage } from '../pages/OptionsPage'
+import { ResultsPage } from '../pages/ResultsPage'
+import { SessionLayout } from '../pages/SessionLayout'
+import { VetoRankPage } from '../pages/VetoRankPage'
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <HashRouter>
-        <nav>
-          <Link to="/">Home</Link>
-        </nav>
-        <main>
-          <Routes>
-            <Route path="/" element={<Notes />} />
-            <Route path="*" element={<p>Not found</p>} />
-          </Routes>
-        </main>
-      </HashRouter>
-    </QueryClientProvider>
+    <HashRouter>
+      <main className="shell">
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route element={<SessionLayout />}>
+            <Route path="/options" element={<OptionsPage />} />
+            <Route path="/veto" element={<VetoRankPage />} />
+            <Route path="/results" element={<ResultsPage />} />
+          </Route>
+          <Route path="*" element={<Landing />} />
+        </Routes>
+      </main>
+    </HashRouter>
   )
 }
