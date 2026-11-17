@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from './supabase'
-import type { Ballot, Option, Participant, Session, SessionData, Veto } from './types'
+import type { Ballot, Option, Participant, Review, Session, SessionData, Veto } from './types'
 
 type State =
   | { status: 'loading' }
@@ -27,12 +27,16 @@ async function fetchAll(code: string): Promise<SessionData | null> {
   const failure = [participants, options, vetoes, ballots].find((r) => r.error)
   if (failure?.error) throw new Error(failure.error.message)
 
+  // Reviews are optional: before migration-003 is run the table is missing, so don't fail the app.
+  const reviews = await supabase.from('reviews').select('*').eq('session_id', session.id)
+
   return {
     session,
     participants: (participants.data ?? []) as Participant[],
     options: (options.data ?? []) as Option[],
     vetoes: (vetoes.data ?? []) as Veto[],
     ballots: (ballots.data ?? []) as Ballot[],
+    reviews: reviews.error ? [] : ((reviews.data ?? []) as Review[]),
   }
 }
 
@@ -79,12 +83,22 @@ export function useSessionData(code: string) {
       schedule,
     )
     channel.subscribe()
+    // Separate channel so a missing reviews table can't break the main subscription.
+    const reviewsChannel = supabase
+      .channel(`reviews-${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reviews', filter: `session_id=eq.${sessionId}` },
+        schedule,
+      )
+      .subscribe()
     // Polling is a safety net if the realtime socket drops.
     const poll = window.setInterval(() => void refresh(), 15000)
     return () => {
       window.clearInterval(poll)
       window.clearTimeout(timer.current)
       void supabase?.removeChannel(channel)
+      void supabase?.removeChannel(reviewsChannel)
     }
   }, [sessionId, refresh])
 

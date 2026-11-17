@@ -1,16 +1,9 @@
 import { useEffect, useRef } from 'react'
-import {
-  Link,
-  NavLink,
-  Navigate,
-  Outlet,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom'
+import { Link, Navigate, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Countdown } from '../components/Countdown'
 import { NameGate } from '../components/NameGate'
 import { ShareCard } from '../components/ShareCard'
+import { Steps } from '../components/Steps'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { getPhase, type Phase } from '../lib/phase'
 import { SessionContext } from '../lib/session-context'
@@ -20,7 +13,7 @@ import { useSessionData } from '../lib/useSessionData'
 
 const PHASE_ROUTE: Record<Phase, string | null> = {
   suggest: null,
-  rank: '/veto',
+  rank: '/rank',
   results: '/results',
 }
 
@@ -84,7 +77,6 @@ export function SessionLayout() {
   }
 
   const creator = participants.find((p) => p.client_id === session.creator_id)
-  const search = `?code=${code}`
   return (
     <SessionContext.Provider
       value={{
@@ -112,11 +104,7 @@ export function SessionLayout() {
         <ShareCard code={session.code} />
       </section>
       <Countdown />
-      <nav className="tabs" aria-label="Session steps">
-        <NavLink to={{ pathname: '/options', search }}>1 · Options</NavLink>
-        <NavLink to={{ pathname: '/veto', search }}>2 · Veto &amp; rank</NavLink>
-        <NavLink to={{ pathname: '/results', search }}>3 · Results</NavLink>
-      </nav>
+      <Steps />
       <Outlet />
       <div className="theme-fab">
         <ThemeToggle />

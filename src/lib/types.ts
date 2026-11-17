@@ -39,10 +39,23 @@ export interface Ballot {
   locked: boolean
 }
 
+export interface Review {
+  participant_id: string
+  session_id: string
+  option_id: string | null
+  food_quality: number
+  ambience: number
+  price: number
+  location_parking: number
+  repeatable: number
+  comment: string
+}
+
 export interface SessionData {
   session: Session
   participants: Participant[]
   options: Option[]
   vetoes: Veto[]
   ballots: Ballot[]
+  reviews: Review[]
 }

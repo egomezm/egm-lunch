@@ -149,7 +149,8 @@ fieldset {
   display: grid;
   gap: 0.4rem;
 }
-input:not([type='radio']) {
+input:not([type='radio']),
+textarea {
   width: 100%;
   padding: 0.7rem 0.9rem;
   border-radius: 12px;
@@ -159,6 +160,7 @@ input:not([type='radio']) {
   font: inherit;
 }
 input:focus-visible,
+textarea:focus-visible,
 button:focus-visible,
 a:focus-visible,
 summary:focus-visible {
@@ -405,27 +407,6 @@ summary:focus-visible {
 }
 .countdown .error {
   grid-column: 1 / -1;
-}
-
-.tabs {
-  display: flex;
-  gap: 0.4rem;
-  overflow-x: auto;
-  padding-bottom: 0.2rem;
-}
-.tabs a {
-  white-space: nowrap;
-  padding: 0.55rem 1rem;
-  border-radius: 999px;
-  text-decoration: none;
-  color: var(--muted);
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-.tabs a.active {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
 }
 
 .list {
@@ -737,4 +718,184 @@ body::before {
   mask-mode: luminance;
   mask-size: 720px 720px;
   -webkit-mask-size: 720px 720px;
+}
+
+textarea {
+  resize: vertical;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Step tracker */
+.steps ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0.25rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(9.5rem, 1fr);
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  height: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  text-decoration: none;
+  position: relative;
+}
+.step-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+}
+.step-text {
+  display: grid;
+  line-height: 1.25;
+}
+.step-text strong {
+  font-size: 0.98rem;
+  color: var(--text);
+}
+.step-text span {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.step.done .step-num {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+.step.live:not(.current) .step-num {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.step.live:not(.current)::after {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.55rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.step.current {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  box-shadow: 0 6px 18px -8px var(--accent);
+}
+.step.current .step-num {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.step.upcoming {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.progress-note {
+  display: block;
+  margin-top: 0.25rem;
+}
+.nudge {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+/* Reviews */
+.stars-row {
+  border: 0;
+  padding: 0;
+  margin: 0.9rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+.stars-row legend {
+  display: contents;
+}
+.stars-row legend span {
+  display: block;
+}
+.stars {
+  display: flex;
+  gap: 0.15rem;
+}
+.star {
+  cursor: pointer;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--border);
+  position: relative;
+  padding: 0 0.1rem;
+}
+.star input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.star.on {
+  color: var(--accent-2);
+}
+.star:has(input:focus-visible) {
+  outline: 3px solid var(--accent-2);
+  border-radius: 6px;
+}
+.char-count {
+  text-align: right;
+  margin: 0.2rem 0 0.8rem;
+}
+.avg-list,
+.comments {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.avg-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.comments li {
+  font-style: italic;
 }

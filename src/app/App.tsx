@@ -4,7 +4,8 @@ import { Landing } from '../pages/Landing'
 import { OptionsPage } from '../pages/OptionsPage'
 import { ResultsPage } from '../pages/ResultsPage'
 import { SessionLayout } from '../pages/SessionLayout'
-import { VetoRankPage } from '../pages/VetoRankPage'
+import { ReviewsPage } from '../pages/ReviewsPage'
+import { RankPage, VetoPage } from '../pages/VetoRank'
 
 export function App() {
   return (
@@ -15,8 +16,10 @@ export function App() {
           <Route path="/" element={<Landing />} />
           <Route element={<SessionLayout />}>
             <Route path="/options" element={<OptionsPage />} />
-            <Route path="/veto" element={<VetoRankPage />} />
+            <Route path="/veto" element={<VetoPage />} />
+            <Route path="/rank" element={<RankPage />} />
             <Route path="/results" element={<ResultsPage />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
           </Route>
           <Route path="*" element={<Landing />} />
         </Routes>

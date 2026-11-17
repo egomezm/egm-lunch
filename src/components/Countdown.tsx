@@ -1,5 +1,6 @@
 import { api } from '../lib/supabase'
 import { formatRemaining, phaseEnds } from '../lib/phase'
+import { getProgress } from '../lib/progress'
 import { useSession } from '../lib/session-context'
 import { useAction } from '../lib/useAction'
 
@@ -15,7 +16,18 @@ const RANK_EXTENSIONS = [
 ]
 
 export function Countdown() {
-  const { session, phase, now, isCreator, clientId, refresh } = useSession()
+  const {
+    session,
+    phase,
+    now,
+    isCreator,
+    clientId,
+    refresh,
+    participants,
+    options,
+    vetoes,
+    ballots,
+  } = useSession()
   const { run, busy, error } = useAction()
   const { suggestEnd, rankEnd } = phaseEnds(session)
 
@@ -28,6 +40,8 @@ export function Countdown() {
     )
   }
 
+  const progress = getProgress(phase, { participants, options, vetoes, ballots })
+  const creator = participants.find((p) => p.client_id === session.creator_id)
   const remaining = (phase === 'suggest' ? suggestEnd : rankEnd) - now
   const extensions = phase === 'suggest' ? SUGGEST_EXTENSIONS : RANK_EXTENSIONS
   const act = (fn: () => Promise<unknown>) =>
@@ -49,6 +63,13 @@ export function Countdown() {
         >
           {formatRemaining(remaining)}
         </strong>
+        <span className="muted small progress-note">
+          {progress.everyoneDone
+            ? isCreator
+              ? "🎉 Everyone's done. You can finish now, or let the timer run."
+              : `🎉 Everyone's done. Waiting for ${creator?.name ?? 'the creator'} to move on.`
+            : `${progress.done} of ${progress.total} finished`}
+        </span>
       </div>
       {isCreator && (
         <div className="creator-controls" aria-label="Creator timer controls">
@@ -73,7 +94,7 @@ export function Countdown() {
           </button>
           <button
             type="button"
-            className="btn btn-ghost"
+            className={progress.everyoneDone ? 'btn btn-primary nudge' : 'btn btn-ghost'}
             disabled={busy}
             onClick={() => act(() => api.endEarly(session.code, clientId))}
           >

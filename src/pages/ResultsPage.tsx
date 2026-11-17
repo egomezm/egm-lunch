@@ -86,7 +86,13 @@ export function ResultsPage() {
         )}
       </section>
 
-      <div className="center">
+      <div className="center actions">
+        <Link
+          className="btn btn-primary"
+          to={{ pathname: '/reviews', search: `?code=${session.code}` }}
+        >
+          ★ Review this place
+        </Link>
         <Link className="btn btn-soft" to="/" state={{ from: session.code }}>
           Start a new session
         </Link>

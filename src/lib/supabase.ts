@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type { RatingKey } from './reviews'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -48,6 +49,24 @@ export const api = {
     call<void>('extend_phase', { p_code: code, p_client_id: clientId, p_seconds: seconds }),
   resetTimer: (code: string, clientId: string) =>
     call<void>('reset_phase_timer', { p_code: code, p_client_id: clientId }),
+  submitReview: (
+    code: string,
+    clientId: string,
+    optionId: string | null,
+    r: Record<RatingKey, number>,
+    comment: string,
+  ) =>
+    call<void>('submit_review', {
+      p_code: code,
+      p_client_id: clientId,
+      p_option_id: optionId,
+      p_food_quality: r.food_quality,
+      p_ambience: r.ambience,
+      p_price: r.price,
+      p_location_parking: r.location_parking,
+      p_repeatable: r.repeatable,
+      p_comment: comment,
+    }),
   endEarly: (code: string, clientId: string) =>
     call<void>('end_phase_early', { p_code: code, p_client_id: clientId }),
 }

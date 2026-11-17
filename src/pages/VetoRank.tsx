@@ -25,22 +25,63 @@ import { api } from '../lib/supabase'
 import type { Option } from '../lib/types'
 import { useAction } from '../lib/useAction'
 
-export function VetoRankPage() {
-  const { phase, session } = useSession()
-  if (phase === 'results') {
+function Closed({
+  title,
+  text,
+  to,
+  cta,
+}: {
+  title: string
+  text: string
+  to: string
+  cta: string
+}) {
+  const { session } = useSession()
+  return (
+    <div className="card narrow center rise">
+      <h2>{title}</h2>
+      <p className="muted">{text}</p>
+      <Link className="btn btn-primary" to={{ pathname: to, search: `?code=${session.code}` }}>
+        {cta}
+      </Link>
+    </div>
+  )
+}
+
+export function VetoPage() {
+  const { phase } = useSession()
+  if (phase === 'suggest') return <VetoBoard />
+  return (
+    <Closed
+      title="Vetoes are closed"
+      text="The suggest and veto timer has ended."
+      to={phase === 'rank' ? '/rank' : '/results'}
+      cta={phase === 'rank' ? 'Go to ranking' : 'See the results'}
+    />
+  )
+}
+
+export function RankPage() {
+  const { phase } = useSession()
+  if (phase === 'rank') return <RankBoard />
+  if (phase === 'suggest') {
     return (
-      <div className="card narrow center rise">
-        <h2>Voting is over</h2>
-        <Link
-          className="btn btn-primary"
-          to={{ pathname: '/results', search: `?code=${session.code}` }}
-        >
-          See the results
-        </Link>
-      </div>
+      <Closed
+        title="Ranking opens soon"
+        text="Ranking starts when the suggest and veto timer ends."
+        to="/veto"
+        cta="Back to vetoes"
+      />
     )
   }
-  return phase === 'suggest' ? <VetoBoard /> : <RankBoard />
+  return (
+    <Closed
+      title="Ranking is over"
+      text="Everyone's rankings are in."
+      to="/results"
+      cta="See the results"
+    />
+  )
 }
 
 function VetoBoard() {
