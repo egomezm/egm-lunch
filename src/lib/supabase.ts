@@ -26,6 +26,13 @@ export const api = {
     call<string>('join_session', { p_code: code, p_client_id: clientId, p_name: name }),
   addOption: (code: string, clientId: string, name: string, url: string) =>
     call<string>('add_option', { p_code: code, p_client_id: clientId, p_name: name, p_url: url }),
+  editOption: (optionId: string, clientId: string, name: string, url: string) =>
+    call<void>('edit_option', {
+      p_option_id: optionId,
+      p_client_id: clientId,
+      p_name: name,
+      p_url: url,
+    }),
   removeOption: (optionId: string, clientId: string) =>
     call<void>('remove_option', { p_option_id: optionId, p_client_id: clientId }),
   toggleVeto: (optionId: string, clientId: string) =>
@@ -39,6 +46,8 @@ export const api = {
     }),
   extend: (code: string, clientId: string, seconds: number) =>
     call<void>('extend_phase', { p_code: code, p_client_id: clientId, p_seconds: seconds }),
+  resetTimer: (code: string, clientId: string) =>
+    call<void>('reset_phase_timer', { p_code: code, p_client_id: clientId }),
   endEarly: (code: string, clientId: string) =>
     call<void>('end_phase_early', { p_code: code, p_client_id: clientId }),
 }

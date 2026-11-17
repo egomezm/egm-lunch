@@ -18,6 +18,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Link } from 'react-router-dom'
+import { PlaceLink } from '../components/PlaceLink'
 import { everythingVetoed, survivingOptions } from '../lib/scoring'
 import { useSession } from '../lib/session-context'
 import { api } from '../lib/supabase'
@@ -79,13 +80,7 @@ function VetoBoard() {
             <article key={o.id} className={count > 0 ? 'card option vetoed' : 'card option'}>
               <div>
                 <h3>
-                  {o.url ? (
-                    <a href={o.url} target="_blank" rel="noreferrer noopener">
-                      {o.name} ↗
-                    </a>
-                  ) : (
-                    o.name
-                  )}
+                  <PlaceLink name={o.name} url={o.url} />
                 </h3>
                 <p className="muted small">Suggested by {whoIs(o.participant_id)}</p>
                 {count > 0 && (

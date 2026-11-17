@@ -83,6 +83,7 @@ export function SessionLayout() {
     )
   }
 
+  const creator = participants.find((p) => p.client_id === session.creator_id)
   const search = `?code=${code}`
   return (
     <SessionContext.Provider
@@ -103,6 +104,7 @@ export function SessionLayout() {
           <p className="muted">
             Hi {me.name} · {participants.length} {participants.length === 1 ? 'person' : 'people'}{' '}
             here
+            {creator && <span className="created-by"> · created by {creator.name}</span>}
           </p>
         </div>
         <details className="invite">

@@ -5,6 +5,8 @@ export interface Session {
   creator_id: string
   suggest_ends_at: string
   rank_seconds: number
+  suggest_minutes?: number
+  rank_base_seconds?: number
   created_at: string
 }
 

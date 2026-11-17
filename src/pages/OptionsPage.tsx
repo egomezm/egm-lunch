@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { PlaceLink } from '../components/PlaceLink'
+import type { Option } from '../lib/types'
 import { getHistory, rememberPlace } from '../lib/storage'
 import { useSession } from '../lib/session-context'
 import { api } from '../lib/supabase'
@@ -110,35 +112,24 @@ export function OptionsPage() {
         {options.length === 0 && <p className="muted">Nothing yet. Be the first to suggest!</p>}
         <ul className="list">
           {options.map((o) => (
-            <li key={o.id} className="row">
-              <div>
-                <strong>
-                  {o.url ? (
-                    <a href={o.url} target="_blank" rel="noreferrer noopener">
-                      {o.name} ↗
-                    </a>
-                  ) : (
-                    o.name
-                  )}
-                </strong>
-                <span className="muted small">by {whoIs(o.participant_id)}</span>
-              </div>
-              {open && o.participant_id === me.id && (
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  aria-label={`Remove ${o.name}`}
-                  onClick={() =>
-                    run(async () => {
-                      await api.removeOption(o.id, clientId)
-                      await refresh()
-                    })
-                  }
-                >
-                  Remove
-                </button>
-              )}
-            </li>
+            <OptionRow
+              key={o.id}
+              option={o}
+              author={whoIs(o.participant_id)}
+              editable={open && o.participant_id === me.id}
+              onSave={(n, u) =>
+                run(async () => {
+                  await api.editOption(o.id, clientId, n, u)
+                  await refresh()
+                })
+              }
+              onRemove={() =>
+                run(async () => {
+                  await api.removeOption(o.id, clientId)
+                  await refresh()
+                })
+              }
+            />
           ))}
         </ul>
         {open && options.length > 0 && (
@@ -151,5 +142,92 @@ export function OptionsPage() {
         )}
       </section>
     </div>
+  )
+}
+
+interface RowProps {
+  option: Option
+  author: string
+  editable: boolean
+  onSave: (name: string, url: string) => Promise<boolean>
+  onRemove: () => Promise<boolean>
+}
+
+function OptionRow({ option, author, editable, onSave, onRemove }: RowProps) {
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState(option.name)
+  const [url, setUrl] = useState(option.url ?? '')
+
+  if (editing && editable) {
+    return (
+      <li className="row editing">
+        <form
+          onSubmit={async (event) => {
+            event.preventDefault()
+            if (await onSave(name.trim(), url.trim())) setEditing(false)
+          }}
+        >
+          <label htmlFor={`n-${option.id}`}>Place</label>
+          <input
+            id={`n-${option.id}`}
+            value={name}
+            maxLength={80}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <label htmlFor={`u-${option.id}`}>Website (optional)</label>
+          <input
+            id={`u-${option.id}`}
+            type="url"
+            value={url}
+            maxLength={300}
+            placeholder="https://…"
+            onChange={(e) => setUrl(e.target.value)}
+          />
+          <div className="choices">
+            <button className="btn btn-primary" disabled={!name.trim()}>
+              Save
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={() => setEditing(false)}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </li>
+    )
+  }
+
+  return (
+    <li className="row">
+      <div>
+        <strong>
+          <PlaceLink name={option.name} url={option.url} />
+        </strong>
+        <span className="muted small">by {author}</span>
+      </div>
+      {editable && (
+        <div className="choices">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            aria-label={`Edit ${option.name}`}
+            onClick={() => {
+              setName(option.name)
+              setUrl(option.url ?? '')
+              setEditing(true)
+            }}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            aria-label={`Remove ${option.name}`}
+            onClick={() => void onRemove()}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+    </li>
   )
 }

@@ -67,9 +67,17 @@ export function Countdown() {
             type="button"
             className="btn btn-ghost"
             disabled={busy}
+            onClick={() => act(() => api.resetTimer(session.code, clientId))}
+          >
+            ↺ Reset timer
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={busy}
             onClick={() => act(() => api.endEarly(session.code, clientId))}
           >
-            {phase === 'suggest' ? 'Start ranking now' : 'Show results now'}
+            ✓ Complete now
           </button>
         </div>
       )}

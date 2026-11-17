@@ -11,6 +11,8 @@ create table if not exists public.sessions (
   creator_id text not null,
   suggest_ends_at timestamptz not null,
   rank_seconds int not null check (rank_seconds between 0 and 86400),
+  suggest_minutes int not null default 30,
+  rank_base_seconds int not null default 60,
   created_at timestamptz not null default now()
 );
 
@@ -114,9 +116,11 @@ begin
       v_code := v_code || substr(v_alphabet, 1 + floor(random() * length(v_alphabet))::int, 1);
     end loop;
     begin
-      insert into sessions (code, name, creator_id, suggest_ends_at, rank_seconds)
+      insert into sessions (code, name, creator_id, suggest_ends_at, rank_seconds,
+                            suggest_minutes, rank_base_seconds)
       values (v_code, trim(p_name), p_creator_id,
-              now() + make_interval(mins => p_suggest_minutes), p_rank_seconds);
+              now() + make_interval(mins => p_suggest_minutes), p_rank_seconds,
+              p_suggest_minutes, p_rank_seconds);
       return v_code;
     exception when unique_violation then
       -- try another code
@@ -307,6 +311,11 @@ grant execute on function
   public.end_phase_early(text, text)
   to anon, authenticated;
 
+-- Creator timer reset (also available as supabase/migration-002-reset-timer.sql for existing projects).
+-- Fresh installs: run migration-002-reset-timer.sql after this file.
+
 -- Realtime updates for the browser.
 alter publication supabase_realtime add table
   public.sessions, public.participants, public.options, public.vetoes, public.ballots;
+
+-- Also run supabase/migration-002-reset-timer.sql (reset timer + edit option).

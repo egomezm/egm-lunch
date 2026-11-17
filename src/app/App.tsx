@@ -1,4 +1,5 @@
 import { HashRouter, Route, Routes } from 'react-router-dom'
+import { BrandHeader, Footer } from '../components/Chrome'
 import { Landing } from '../pages/Landing'
 import { OptionsPage } from '../pages/OptionsPage'
 import { ResultsPage } from '../pages/ResultsPage'
@@ -9,6 +10,7 @@ export function App() {
   return (
     <HashRouter>
       <main className="shell">
+        <BrandHeader />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route element={<SessionLayout />}>
@@ -19,6 +21,7 @@ export function App() {
           <Route path="*" element={<Landing />} />
         </Routes>
       </main>
+      <Footer />
     </HashRouter>
   )
 }

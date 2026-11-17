@@ -83,7 +83,7 @@ a {
 .shell {
   max-width: 62rem;
   margin: 0 auto;
-  padding: 1.25rem 1rem 5rem;
+  padding: 1.25rem 1rem 5.5rem;
   display: grid;
   gap: 1rem;
 }
@@ -618,4 +618,71 @@ summary:focus-visible {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Brand, footer, favicons */
+.brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 1.1rem;
+}
+.floating-footer {
+  position: fixed;
+  left: 50%;
+  bottom: 0.6rem;
+  transform: translateX(-50%);
+  z-index: 4;
+  font-size: 0.72rem;
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+.floating-footer:hover {
+  opacity: 1;
+}
+.floating-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: none;
+}
+.place {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.favicon {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  flex: none;
+}
+.favicon.fallback {
+  font-size: 0.9rem;
+  line-height: 20px;
+  text-align: center;
+}
+.created-by {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.row.editing {
+  display: block;
 }

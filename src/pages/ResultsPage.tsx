@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Favicon } from '../components/PlaceLink'
 import { everythingVetoed, scoreOptions, survivingOptions } from '../lib/scoring'
 import { useSession } from '../lib/session-context'
 
@@ -46,6 +47,7 @@ export function ResultsPage() {
             target="_blank"
             rel="noreferrer noopener"
           >
+            <Favicon url={option.url} />
             Visit website ↗
           </a>
         )}
