@@ -97,6 +97,9 @@ export function SessionLayout() {
         refresh,
       }}
     >
+      <section className="card invite-banner rise" aria-label="Session code and invite">
+        <ShareCard code={session.code} />
+      </section>
       <header className="session-head rise">
         <div>
           <span className="eyebrow">Lunch session</span>
@@ -107,12 +110,6 @@ export function SessionLayout() {
             {creator && <span className="created-by"> · created by {creator.name}</span>}
           </p>
         </div>
-        <details className="invite">
-          <summary className="btn btn-soft">Invite · QR</summary>
-          <div className="card popover">
-            <ShareCard code={session.code} />
-          </div>
-        </details>
       </header>
       <Countdown />
       <nav className="tabs" aria-label="Session steps">

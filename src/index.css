@@ -686,3 +686,21 @@ summary:focus-visible {
 .row.editing {
   display: block;
 }
+
+.invite-banner .share {
+  grid-template-columns: auto 1fr;
+  justify-items: stretch;
+  align-items: center;
+  gap: 1.25rem;
+}
+.invite-banner .code {
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  line-height: 1;
+  color: var(--accent, inherit);
+}
+@media (max-width: 520px) {
+  .invite-banner .share {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}

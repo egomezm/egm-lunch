@@ -15,10 +15,10 @@ export function ShareCard({ code }: { code: string }) {
   return (
     <div className="share">
       <div className="qr" aria-label={`QR code for session ${code}`}>
-        <QRCodeSVG value={link} size={168} marginSize={2} />
+        <QRCodeSVG value={link} size={150} marginSize={2} />
       </div>
       <div className="share-info">
-        <span className="eyebrow">Session code</span>
+        <span className="eyebrow">Session code · share to join</span>
         <strong className="code">{code}</strong>
         <input readOnly value={link} aria-label="Session link" onFocus={(e) => e.target.select()} />
         <button type="button" className="btn btn-primary" onClick={copy}>
