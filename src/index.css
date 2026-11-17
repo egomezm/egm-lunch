@@ -15,6 +15,7 @@
   --ok: #1e8e5a;
   --shadow: 0 10px 30px -12px rgba(120, 60, 20, 0.25);
   --radius: 18px;
+  --pattern: rgba(120, 60, 20, 0.09);
   font-family:
     'Inter',
     system-ui,
@@ -42,6 +43,7 @@
   --danger: #ff6b6b;
   --ok: #4cd194;
   --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  --pattern: rgba(255, 255, 255, 0.09);
   color-scheme: dark;
 }
 
@@ -721,4 +723,18 @@ summary:focus-visible {
 
 .brand img {
   border-radius: 10px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--pattern);
+  mask-image: url('./assets/food-pattern.svg');
+  -webkit-mask-image: url('./assets/food-pattern.svg');
+  mask-mode: luminance;
+  mask-size: 360px 360px;
+  -webkit-mask-size: 360px 360px;
 }
