@@ -718,3 +718,7 @@ summary:focus-visible {
 .invite-banner .share-info .btn {
   font-size: 0.8rem;
 }
+
+.brand img {
+  border-radius: 10px;
+}
