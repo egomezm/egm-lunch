@@ -619,7 +619,12 @@ summary:focus-visible {
   color: var(--text);
   font-weight: 800;
   letter-spacing: -0.02em;
-  font-size: 1.1rem;
+  --brand-size: clamp(2.4rem, 9vw, 3rem);
+  font-size: var(--brand-size);
+  line-height: 1;
+}
+.brand span {
+  display: block;
 }
 .floating-footer {
   position: fixed;
@@ -699,7 +704,13 @@ summary:focus-visible {
 }
 
 .brand img {
-  border-radius: 10px;
+  height: var(--brand-size);
+  width: var(--brand-size);
+}
+
+/* Reusable soft drop shadow (down-right, blurred) for images and gradient text */
+.soft-shadow {
+  filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.3));
 }
 
 body::before {

@@ -6,8 +6,8 @@ export function BrandHeader() {
   return (
     <header className="brand-bar">
       <Link to="/" className="brand" aria-label="Lunch Picker home">
-        <img src={logo} alt="" width={36} height={36} />
-        <span>Lunch Picker</span>
+        <img className="soft-shadow" src={logo} alt="" width={48} height={48} />
+        <span className="gradient-text soft-shadow">Lunch Picker</span>
       </Link>
     </header>
   )
