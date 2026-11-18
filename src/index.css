@@ -743,7 +743,9 @@ textarea {
 }
 .step {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
   min-width: 0;
   gap: 0.65rem;
   height: 100%;
@@ -770,6 +772,8 @@ textarea {
 .step-text {
   display: grid;
   min-width: 0;
+  justify-items: start;
+  text-align: left;
   line-height: 1.25;
 }
 .step-text strong {
