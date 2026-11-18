@@ -12,16 +12,14 @@ const STEPS: { title: string; detail: string; path: string; phase: Phase }[] = [
   { title: 'Reviews', detail: 'rate the place', path: '/reviews', phase: 'results' },
 ]
 
-export function Steps() {
-  const { phase, session } = useSession()
-  const search = `?code=${session.code}`
-
+export function ProgressSteps({ phase, code }: { phase?: Phase; code?: string }) {
+  const search = code ? `?code=${code}` : ''
   return (
-    <nav className="steps" aria-label="Session steps">
+    <nav className="progress-steps" aria-label="Session steps">
       <ol>
         {STEPS.map((step, i) => {
-          const rel = PHASE_ORDER[step.phase] - PHASE_ORDER[phase]
-          const state = rel < 0 ? 'done' : rel === 0 ? 'live' : 'upcoming'
+          const rel = phase ? PHASE_ORDER[step.phase] - PHASE_ORDER[phase] : null
+          const state = rel === null ? '' : rel < 0 ? 'done' : rel === 0 ? 'live' : 'upcoming'
           const body = (
             <>
               <span className="step-num" aria-hidden="true">
@@ -35,8 +33,8 @@ export function Steps() {
           )
           return (
             <li key={step.path}>
-              {state === 'upcoming' ? (
-                <span className="step upcoming" aria-disabled="true">
+              {!code || state === 'upcoming' ? (
+                <span className={`step ${state}`} aria-disabled={!!code}>
                   {body}
                 </span>
               ) : (
@@ -53,4 +51,9 @@ export function Steps() {
       </ol>
     </nav>
   )
+}
+
+export function Steps() {
+  const { phase, session } = useSession()
+  return <ProgressSteps phase={phase} code={session.code} />
 }
