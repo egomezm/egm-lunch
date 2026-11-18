@@ -18,9 +18,9 @@ const ballot = (participant_id: string, ranking: string[]): Ballot => ({
   locked: true,
 })
 
-const a = opt('a', 'Tacos')
-const b = opt('b', 'Pizza')
-const c = opt('c', 'Sushi')
+const a = { ...opt('a', 'Tacos'), created_at: '2026-01-01T10:00:00Z' }
+const b = { ...opt('b', 'Pizza'), created_at: '2026-01-01T10:01:00Z' }
+const c = { ...opt('c', 'Sushi'), created_at: '2026-01-01T10:02:00Z' }
 
 describe('survivingOptions', () => {
   it('removes options with at least one veto', () => {
@@ -41,21 +41,21 @@ describe('scoreOptions', () => {
       [ballot('1', ['a', 'b', 'c']), ballot('2', ['b', 'a', 'c'])],
     )
     expect(rows.map((r) => [r.option.id, r.points])).toEqual([
-      ['b', 5],
       ['a', 5],
+      ['b', 5],
       ['c', 2],
     ])
   })
 
-  it('breaks ties by first places, then alphabetically', () => {
-    const byFirst = scoreOptions([a, b], [ballot('1', ['b', 'a']), ballot('2', ['a', 'b'])])
-    expect(byFirst.map((r) => r.option.name)).toEqual(['Pizza', 'Tacos'])
+  it('breaks ties in favour of the option suggested first', () => {
+    const byFirst = scoreOptions([b, a], [ballot('1', ['b', 'a']), ballot('2', ['a', 'b'])])
+    expect(byFirst.map((r) => r.option.name)).toEqual(['Tacos', 'Pizza'])
 
     const three = scoreOptions(
       [a, b, c],
       [ballot('1', ['a', 'b', 'c']), ballot('2', ['b', 'c', 'a']), ballot('3', ['c', 'a', 'b'])],
     )
-    expect(three.map((r) => r.option.name)).toEqual(['Pizza', 'Sushi', 'Tacos'])
+    expect(three.map((r) => r.option.name)).toEqual(['Tacos', 'Pizza', 'Sushi'])
   })
 
   it('ignores vetoed options inside ballots and handles no ballots', () => {

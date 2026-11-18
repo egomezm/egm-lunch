@@ -21,7 +21,7 @@ export function everythingVetoed(options: Option[], vetoes: Veto[]): boolean {
 }
 
 // Borda count: with N survivors, 1st place earns N points and last earns 1.
-// Ties: most first places, then alphabetical.
+// Ties: the option suggested first wins.
 export function scoreOptions(survivors: Option[], ballots: Ballot[]): ScoreRow[] {
   const n = survivors.length
   const rows = new Map<string, ScoreRow>(
@@ -38,7 +38,7 @@ export function scoreOptions(survivors: Option[], ballots: Ballot[]): ScoreRow[]
   return [...rows.values()].sort(
     (a, b) =>
       b.points - a.points ||
-      b.firstPlaces - a.firstPlaces ||
-      a.option.name.localeCompare(b.option.name),
+      a.option.created_at.localeCompare(b.option.created_at) ||
+      a.option.id.localeCompare(b.option.id),
   )
 }

@@ -13,6 +13,7 @@ function PlaceRow({ place, value }: { place: PlaceStat; value: string }) {
       <span className="place-name">
         {place.url && <Favicon url={place.url} />}
         {place.name}
+        {place.suggestedBy && <span className="by">by {place.suggestedBy}</span>}
       </span>
       <strong>{value}</strong>
     </li>
@@ -39,6 +40,13 @@ export function StatsPage() {
   const { stats } = state
   const winners = stats.places
     .filter((p) => p.wins > 0)
+    .sort((a, b) => b.wins - a.wins || b.suggested - a.suggested)
+    .slice(0, 5)
+  const users = [...stats.users].sort(
+    (a, b) => b.sessions - a.sessions || b.suggested - a.suggested,
+  )
+  const topUsers = stats.users
+    .filter((u) => u.wins > 0)
     .sort((a, b) => b.wins - a.wins || b.suggested - a.suggested)
     .slice(0, 5)
   const suggested = [...stats.places].sort((a, b) => b.suggested - a.suggested).slice(0, 5)
@@ -112,6 +120,35 @@ export function StatsPage() {
         </section>
       </div>
 
+      <div className="grid-2">
+        <section className="card">
+          <h3>🥇 Users with most wins</h3>
+          {topUsers.length === 0 && <p className="muted">No winning suggestions yet.</p>}
+          <ul className="avg-list">
+            {topUsers.map((u) => (
+              <li key={u.key}>
+                <span>{u.name}</span>
+                <strong>{u.wins}×</strong>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section className="card">
+          <h3>👥 Users</h3>
+          <ul className="avg-list">
+            {users.map((u) => (
+              <li key={u.key}>
+                <span>{u.name}</span>
+                <span className="muted small">
+                  {u.sessions} {u.sessions === 1 ? 'lunch' : 'lunches'} · {u.suggested} suggested ·{' '}
+                  {u.wins} {u.wins === 1 ? 'win' : 'wins'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
       {stats.categoryAverages && (
         <section className="card">
           <h3>Average review scores</h3>
@@ -134,6 +171,7 @@ export function StatsPage() {
             <li key={s.code}>
               <span>
                 <strong>{s.winner ?? 'No winner'}</strong>
+                {s.suggestedBy && <span className="by"> by {s.suggestedBy}</span>}
                 <span className="muted small">
                   {' '}
                   · {s.name} · {s.participants} {s.participants === 1 ? 'person' : 'people'}

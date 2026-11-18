@@ -23,6 +23,15 @@ export interface PlaceStat {
   reviews: number
   rating: number | null
   lastSeen: string
+  suggestedBy: string | null
+}
+
+export interface UserStat {
+  key: string
+  name: string
+  sessions: number
+  suggested: number
+  wins: number
 }
 
 export interface SessionSummary {
@@ -31,12 +40,14 @@ export interface SessionSummary {
   date: string
   participants: number
   winner: string | null
+  suggestedBy: string | null
 }
 
 export interface Stats {
   finishedSessions: number
   participants: number
   places: PlaceStat[]
+  users: UserStat[]
   reviewCount: number
   categoryAverages: Record<RatingKey, number> | null
   recent: SessionSummary[]
@@ -64,22 +75,47 @@ export function buildStats(raw: RawHistory, now = Date.now()): Stats {
         reviews: 0,
         rating: null,
         lastSeen: '',
+        suggestedBy: null,
       }
       places.set(key, p)
     }
     return p
   }
 
+  const participantById = new Map(raw.participants.map((p) => [p.id, p]))
+  const users = new Map<string, UserStat>()
+  const userOf = (participantId: string) => {
+    const part = participantById.get(participantId)
+    if (!part) return null
+    let u = users.get(part.client_id)
+    if (!u) {
+      u = { key: part.client_id, name: part.name.trim(), sessions: 0, suggested: 0, wins: 0 }
+      users.set(part.client_id, u)
+    }
+    u.name = part.name.trim() || u.name
+    return u
+  }
+  const seenInSession = new Set<string>()
+  const suggesterName = (o: Option) => participantById.get(o.participant_id)?.name.trim() || null
+
   const recent: SessionSummary[] = []
   const sorted = [...raw.sessions].sort((a, b) => a.created_at.localeCompare(b.created_at))
   for (const s of sorted) {
     const options = optionsBySession.get(s.id) ?? []
+    for (const part of raw.participants) {
+      if (part.session_id !== s.id || seenInSession.has(s.id + part.client_id)) continue
+      seenInSession.add(s.id + part.client_id)
+      userOf(part.id)!.sessions += 1
+    }
     for (const o of options) {
       const p = placeOf(o)
       p.suggested += 1
+      const u = userOf(o.participant_id)
+      if (u) u.suggested += 1
       if (s.created_at >= p.lastSeen) {
         p.lastSeen = s.created_at
         p.name = o.name.trim()
+        p.suggestedBy = suggesterName(o)
       }
       if (isValidUrl(o.url) && s.created_at >= p.lastSeen) p.url = o.url.trim()
       else if (isValidUrl(o.url) && !p.url) p.url = o.url.trim()
@@ -94,13 +130,18 @@ export function buildStats(raw: RawHistory, now = Date.now()): Stats {
       ballotsBySession.get(s.id) ?? [],
     )
     const winner = rows[0]?.option
-    if (winner) placeOf(winner).wins += 1
+    if (winner) {
+      placeOf(winner).wins += 1
+      const u = userOf(winner.participant_id)
+      if (u) u.wins += 1
+    }
     recent.push({
       code: s.code,
       name: s.name,
       date: s.created_at,
       participants: raw.participants.filter((p) => p.session_id === s.id).length,
       winner: winner?.name.trim() ?? null,
+      suggestedBy: winner ? suggesterName(winner) : null,
     })
   }
 
@@ -123,6 +164,7 @@ export function buildStats(raw: RawHistory, now = Date.now()): Stats {
     finishedSessions: recent.length,
     participants: new Set(raw.participants.map((p) => p.client_id)).size,
     places: [...places.values()],
+    users: [...users.values()],
     reviewCount: rated.length,
     categoryAverages: rated.length
       ? (Object.fromEntries(
