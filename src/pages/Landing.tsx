@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ProgressSteps } from '../components/Steps'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { getClientId } from '../lib/storage'
 import { api, isConfigured } from '../lib/supabase'
@@ -22,7 +23,7 @@ export function Landing() {
   const navigate = useNavigate()
   const { run, busy, error } = useAction()
   const [name, setName] = useState('')
-  const [suggestMinutes, setSuggestMinutes] = useState(30)
+  const [suggestMinutes, setSuggestMinutes] = useState(15)
   const [rankSeconds, setRankSeconds] = useState(60)
   const [joinCode, setJoinCode] = useState('')
 
@@ -55,20 +56,7 @@ export function Landing() {
           Everyone suggests places, vetoes the ones they can't stand, then ranks what's left. One
           clear winner, no endless chat thread.
         </p>
-        <ol className="steps">
-          <li>
-            <b>Suggest</b> up to 3 places
-          </li>
-          <li>
-            <b>Veto</b> the no-gos
-          </li>
-          <li>
-            <b>Rank</b> your favorites
-          </li>
-          <li>
-            <b>Eat</b> the winner 🍽️
-          </li>
-        </ol>
+        <ProgressSteps />
       </section>
 
       <div className="landing-forms">
