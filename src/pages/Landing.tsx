@@ -12,7 +12,7 @@ const SUGGEST_CHOICES = [
   { label: '45 min', value: 45 },
   { label: '1 hour', value: 60 },
 ]
-const RANK_CHOICES = [
+const SHORT_CHOICES = [
   { label: '1 min', value: 60 },
   { label: '2 min', value: 120 },
   { label: '5 min', value: 300 },
@@ -24,6 +24,7 @@ export function Landing() {
   const { run, busy, error } = useAction()
   const [name, setName] = useState('')
   const [suggestMinutes, setSuggestMinutes] = useState(15)
+  const [vetoSeconds, setVetoSeconds] = useState(60)
   const [rankSeconds, setRankSeconds] = useState(60)
   const [joinCode, setJoinCode] = useState('')
 
@@ -31,7 +32,13 @@ export function Landing() {
     event.preventDefault()
     let code = ''
     const ok = await run(async () => {
-      code = await api.createSession(name.trim(), getClientId(), suggestMinutes, rankSeconds)
+      code = await api.createSession(
+        name.trim(),
+        getClientId(),
+        suggestMinutes,
+        vetoSeconds,
+        rankSeconds,
+      )
     })
     if (ok) navigate({ pathname: '/options', search: `?code=${code}` })
   }
@@ -76,7 +83,7 @@ export function Landing() {
             onChange={(e) => setName(e.target.value)}
           />
           <fieldset>
-            <legend>Suggest &amp; veto timer</legend>
+            <legend>Suggest timer</legend>
             <div className="choices">
               {SUGGEST_CHOICES.map((c) => (
                 <label key={c.value} className={suggestMinutes === c.value ? 'chip on' : 'chip'}>
@@ -92,9 +99,25 @@ export function Landing() {
             </div>
           </fieldset>
           <fieldset>
+            <legend>Veto timer</legend>
+            <div className="choices">
+              {SHORT_CHOICES.map((c) => (
+                <label key={c.value} className={vetoSeconds === c.value ? 'chip on' : 'chip'}>
+                  <input
+                    type="radio"
+                    name="veto"
+                    checked={vetoSeconds === c.value}
+                    onChange={() => setVetoSeconds(c.value)}
+                  />
+                  {c.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
             <legend>Ranking timer</legend>
             <div className="choices">
-              {RANK_CHOICES.map((c) => (
+              {SHORT_CHOICES.map((c) => (
                 <label key={c.value} className={rankSeconds === c.value ? 'chip on' : 'chip'}>
                   <input
                     type="radio"

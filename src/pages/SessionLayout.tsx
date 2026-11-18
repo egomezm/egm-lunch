@@ -13,6 +13,7 @@ import { useSessionData } from '../lib/useSessionData'
 
 const PHASE_ROUTE: Record<Phase, string | null> = {
   suggest: null,
+  veto: '/veto',
   rank: '/rank',
   results: '/results',
 }
@@ -70,7 +71,7 @@ export function SessionLayout() {
         code={code}
         sessionName={session.name}
         clientId={clientId}
-        canJoin={phase === 'suggest'}
+        canJoin={phase === 'suggest' || phase === 'veto'}
         onJoined={refresh}
       />
     )

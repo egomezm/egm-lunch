@@ -50,11 +50,21 @@ function Closed({
 
 export function VetoPage() {
   const { phase } = useSession()
-  if (phase === 'suggest') return <VetoBoard />
+  if (phase === 'veto') return <VetoBoard />
+  if (phase === 'suggest') {
+    return (
+      <Closed
+        title="Vetoes open after suggestions"
+        text="Vetoing starts when the suggestion timer ends."
+        to="/options"
+        cta="Back to suggestions"
+      />
+    )
+  }
   return (
     <Closed
       title="Vetoes are closed"
-      text="The suggest and veto timer has ended."
+      text="The veto timer has ended."
       to={phase === 'rank' ? '/rank' : '/results'}
       cta={phase === 'rank' ? 'Go to ranking' : 'See the results'}
     />
@@ -64,11 +74,11 @@ export function VetoPage() {
 export function RankPage() {
   const { phase } = useSession()
   if (phase === 'rank') return <RankBoard />
-  if (phase === 'suggest') {
+  if (phase === 'suggest' || phase === 'veto') {
     return (
       <Closed
         title="Ranking opens soon"
-        text="Ranking starts when the suggest and veto timer ends."
+        text="Ranking starts when the veto timer ends."
         to="/veto"
         cta="Back to vetoes"
       />

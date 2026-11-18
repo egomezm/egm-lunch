@@ -9,7 +9,7 @@ const SUGGEST_EXTENSIONS = [
   { label: '+2 h', seconds: 7200 },
   { label: '+3 h', seconds: 10800 },
 ]
-const RANK_EXTENSIONS = [
+const SHORT_EXTENSIONS = [
   { label: '+2 min', seconds: 120 },
   { label: '+5 min', seconds: 300 },
   { label: '+10 min', seconds: 600 },
@@ -29,7 +29,7 @@ export function Countdown() {
     ballots,
   } = useSession()
   const { run, busy, error } = useAction()
-  const { suggestEnd, rankEnd } = phaseEnds(session)
+  const { suggestEnd, vetoEnd, rankEnd } = phaseEnds(session)
 
   if (phase === 'results') {
     return (
@@ -42,8 +42,11 @@ export function Countdown() {
 
   const progress = getProgress(phase, { participants, options, vetoes, ballots })
   const creator = participants.find((p) => p.client_id === session.creator_id)
-  const remaining = (phase === 'suggest' ? suggestEnd : rankEnd) - now
-  const extensions = phase === 'suggest' ? SUGGEST_EXTENSIONS : RANK_EXTENSIONS
+  const remaining = (phase === 'suggest' ? suggestEnd : phase === 'veto' ? vetoEnd : rankEnd) - now
+  const extensions = phase === 'suggest' ? SUGGEST_EXTENSIONS : SHORT_EXTENSIONS
+  const label = { suggest: 'Suggestions end in', veto: 'Vetoes end in', rank: 'Ranking locks in' }[
+    phase
+  ]
   const act = (fn: () => Promise<unknown>) =>
     run(async () => {
       await fn()
@@ -53,9 +56,7 @@ export function Countdown() {
   return (
     <div className="card countdown">
       <div>
-        <span className="eyebrow">
-          {phase === 'suggest' ? 'Suggest & veto ends in' : 'Ranking locks in'}
-        </span>
+        <span className="eyebrow">{label}</span>
         <strong
           className={`countdown-time ${remaining < 60_000 ? 'urgent' : ''}`}
           role="timer"

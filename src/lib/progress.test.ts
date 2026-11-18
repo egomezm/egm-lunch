@@ -21,17 +21,16 @@ const veto = (who: string, option: string) => ({
 })
 
 describe('getProgress', () => {
-  it('suggest needs 3 places and all possible vetoes from everyone', () => {
-    const data = {
-      participants: people,
-      options: threeEach,
-      vetoes: [veto('a', 'b1')],
-      ballots: [],
-    }
-    expect(getProgress('suggest', data)).toEqual({ done: 1, total: 2, everyoneDone: false })
+  it('suggest is done at 3 places each; veto at all possible vetoes', () => {
+    const half = { participants: people, options: threeEach.slice(0, 5), vetoes: [], ballots: [] }
+    expect(getProgress('suggest', half)).toEqual({ done: 1, total: 2, everyoneDone: false })
+    const full = { ...half, options: threeEach }
+    expect(getProgress('suggest', full)).toEqual({ done: 2, total: 2, everyoneDone: true })
 
+    const data = { ...full, vetoes: [veto('a', 'b1')] }
+    expect(getProgress('veto', data)).toEqual({ done: 1, total: 2, everyoneDone: false })
     const all = { ...data, vetoes: [veto('a', 'b1'), veto('b', 'a1')] }
-    expect(getProgress('suggest', all)).toEqual({ done: 2, total: 2, everyoneDone: true })
+    expect(getProgress('veto', all)).toEqual({ done: 2, total: 2, everyoneDone: true })
   })
 
   it('rank is done when every ballot is locked', () => {

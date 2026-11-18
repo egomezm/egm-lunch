@@ -1,18 +1,19 @@
 import type { Session } from './types'
 
-export type Phase = 'suggest' | 'rank' | 'results'
+export type Phase = 'suggest' | 'veto' | 'rank' | 'results'
 
-export function phaseEnds(session: Pick<Session, 'suggest_ends_at' | 'rank_seconds'>) {
+type Timing = Pick<Session, 'suggest_ends_at' | 'veto_seconds' | 'rank_seconds'>
+
+export function phaseEnds(session: Timing) {
   const suggestEnd = Date.parse(session.suggest_ends_at)
-  return { suggestEnd, rankEnd: suggestEnd + session.rank_seconds * 1000 }
+  const vetoEnd = suggestEnd + session.veto_seconds * 1000
+  return { suggestEnd, vetoEnd, rankEnd: vetoEnd + session.rank_seconds * 1000 }
 }
 
-export function getPhase(
-  session: Pick<Session, 'suggest_ends_at' | 'rank_seconds'>,
-  now: number,
-): Phase {
-  const { suggestEnd, rankEnd } = phaseEnds(session)
+export function getPhase(session: Timing, now: number): Phase {
+  const { suggestEnd, vetoEnd, rankEnd } = phaseEnds(session)
   if (now < suggestEnd) return 'suggest'
+  if (now < vetoEnd) return 'veto'
   if (now < rankEnd) return 'rank'
   return 'results'
 }

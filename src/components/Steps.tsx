@@ -2,11 +2,11 @@ import { NavLink } from 'react-router-dom'
 import type { Phase } from '../lib/phase'
 import { useSession } from '../lib/session-context'
 
-const PHASE_ORDER: Record<Phase, number> = { suggest: 0, rank: 1, results: 2 }
+const PHASE_ORDER: Record<Phase, number> = { suggest: 0, veto: 1, rank: 2, results: 3 }
 
 const STEPS: { title: string; detail: string; path: string; phase: Phase }[] = [
   { title: 'Suggest', detail: 'up to 3 places', path: '/options', phase: 'suggest' },
-  { title: 'Veto', detail: 'knock out the no-gos', path: '/veto', phase: 'suggest' },
+  { title: 'Veto', detail: 'knock out the no-gos', path: '/veto', phase: 'veto' },
   { title: 'Rank', detail: 'order your favorites', path: '/rank', phase: 'rank' },
   { title: 'Results', detail: 'see the winner', path: '/results', phase: 'results' },
   { title: 'Reviews', detail: 'rate the place', path: '/reviews', phase: 'results' },

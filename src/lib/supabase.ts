@@ -16,11 +16,18 @@ async function call<T>(fn: string, args: Record<string, unknown> = {}): Promise<
 
 export const api = {
   serverNow: () => call<string>('server_now'),
-  createSession: (name: string, creatorId: string, suggestMinutes: number, rankSeconds: number) =>
+  createSession: (
+    name: string,
+    creatorId: string,
+    suggestMinutes: number,
+    vetoSeconds: number,
+    rankSeconds: number,
+  ) =>
     call<string>('create_session', {
       p_name: name,
       p_creator_id: creatorId,
       p_suggest_minutes: suggestMinutes,
+      p_veto_seconds: vetoSeconds,
       p_rank_seconds: rankSeconds,
     }),
   join: (code: string, clientId: string, name: string) =>

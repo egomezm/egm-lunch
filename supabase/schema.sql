@@ -319,3 +319,4 @@ alter publication supabase_realtime add table
   public.sessions, public.participants, public.options, public.vetoes, public.ballots;
 
 -- Also run supabase/migration-002-reset-timer.sql (reset timer + edit option).
+-- Then run migration-003-reviews.sql and migration-004-veto-timer.sql (separate veto timer).
