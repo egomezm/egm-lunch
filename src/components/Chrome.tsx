@@ -9,6 +9,9 @@ export function BrandHeader() {
         <img className="soft-shadow" src={logo} alt="" width={48} height={48} />
         <span className="gradient-text soft-shadow">Lunch Picker</span>
       </Link>
+      <Link to="/stats" className="btn btn-soft stats-link">
+        📊 Stats
+      </Link>
     </header>
   )
 }

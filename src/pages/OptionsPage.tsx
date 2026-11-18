@@ -2,7 +2,10 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { PlaceLink } from '../components/PlaceLink'
 import type { Option } from '../lib/types'
+import { isValidUrl } from '../lib/links'
+import { placeKey, suggestablePlaces } from '../lib/stats'
 import { getHistory, rememberPlace } from '../lib/storage'
+import { useHistory } from '../lib/useHistory'
 import { useSession } from '../lib/session-context'
 import { api } from '../lib/supabase'
 import { useAction } from '../lib/useAction'
@@ -18,7 +21,21 @@ export function OptionsPage() {
   const open = phase === 'suggest'
   const mine = options.filter((o) => o.participant_id === me.id)
   const taken = new Set(options.map((o) => o.name.trim().toLowerCase()))
-  const past = getHistory().filter((p) => !taken.has(p.name.trim().toLowerCase()))
+  const history = useHistory()
+  const winnerKeys = new Set(
+    history.status === 'ready'
+      ? history.stats.places.filter((p) => p.wins > 0).map((p) => p.key)
+      : [],
+  )
+  const teamPast =
+    history.status === 'ready'
+      ? suggestablePlaces(history.stats, taken).map((p) => ({ name: p.name, url: p.url ?? '' }))
+      : []
+  const past = [...teamPast, ...getHistory()]
+    .filter(
+      (p) => isValidUrl(p.url) && !taken.has(placeKey(p.name)) && !winnerKeys.has(placeKey(p.name)),
+    )
+    .filter((p, i, all) => all.findIndex((q) => placeKey(q.name) === placeKey(p.name)) === i)
   const whoIs = (id: string) => participants.find((p) => p.id === id)?.name ?? 'Someone'
 
   async function add(event: FormEvent) {
@@ -85,7 +102,7 @@ export function OptionsPage() {
 
         {open && mine.length < MAX_OPTIONS && past.length > 0 && (
           <div className="history">
-            <span className="eyebrow">From your past lunches</span>
+            <span className="eyebrow">Suggested before</span>
             <div className="choices">
               {past.slice(0, 8).map((p) => (
                 <button
