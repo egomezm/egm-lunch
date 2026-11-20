@@ -1006,3 +1006,6 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+.history-winner-line {
+  font-weight: 600;
+}

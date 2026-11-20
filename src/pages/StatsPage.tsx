@@ -53,6 +53,9 @@ function SessionHistory({ sessions }: { sessions: SessionDetail[] }) {
                 >
                   <strong>{s.name}</strong>
                   <span className="muted small">{fmtDateTime(s.createdAt)}</span>
+                  <span className="history-winner-line small">
+                    🏆 {s.winner ?? (s.phase === 'results' ? 'No winner' : 'In progress')}
+                  </span>
                   <span className="muted small">
                     {s.participants.length} {s.participants.length === 1 ? 'user' : 'users'} ·
                     Summary →
