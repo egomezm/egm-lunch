@@ -1009,3 +1009,12 @@ textarea {
 .history-winner-line {
   font-weight: 600;
 }
+.stat-rows {
+  max-height: 29.5rem;
+  overflow-y: auto;
+}
+.history-detail .avg-list li {
+  background: var(--surface);
+  gap: 1rem;
+  align-items: center;
+}

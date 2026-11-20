@@ -1,21 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Favicon } from '../components/PlaceLink'
-import { useState } from 'react'
-import type { PlaceStat, SessionDetail } from '../lib/stats'
+import { useState, type ReactNode } from 'react'
+import type { PlaceStat, SessionDetail, Stats } from '../lib/stats'
 import { useHistory } from '../lib/useHistory'
-
-function PlaceRow({ place, value }: { place: PlaceStat; value: string }) {
-  return (
-    <li>
-      <span className="place-name">
-        {place.url && <Favicon url={place.url} />}
-        {place.name}
-        {place.suggestedBy && <span className="by">by {place.suggestedBy}</span>}
-      </span>
-      <strong>{value}</strong>
-    </li>
-  )
-}
 
 const fmtDateTime = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -119,6 +106,95 @@ function SessionSummaryView({ session: s }: { session: SessionDetail }) {
   )
 }
 
+type StatKey = 'Winners' | 'Users' | 'Most Vetoed' | 'Most Suggested' | 'Best Rated'
+const STAT_ROWS: StatKey[] = ['Winners', 'Users', 'Most Vetoed', 'Most Suggested', 'Best Rated']
+  .slice()
+  .sort((a, b) => b.localeCompare(a)) as StatKey[]
+
+function SessionStats({ stats }: { stats: Stats }) {
+  const [selected, setSelected] = useState<StatKey>(STAT_ROWS[0])
+  const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name)
+
+  const rows: { key: string; node: ReactNode; value: string }[] = (() => {
+    const place = (p: PlaceStat, value: string) => ({
+      key: p.key,
+      value,
+      node: (
+        <span className="place-name">
+          {p.url && <Favicon url={p.url} />}
+          {p.name}
+          {p.suggestedBy && <span className="by">by {p.suggestedBy}</span>}
+        </span>
+      ),
+    })
+    switch (selected) {
+      case 'Winners':
+        return stats.places
+          .filter((p) => p.wins > 0)
+          .sort((a, b) => b.wins - a.wins || byName(a, b))
+          .map((p) => place(p, `${p.wins}×`))
+      case 'Best Rated':
+        return stats.places
+          .filter((p) => p.rating !== null)
+          .sort((a, b) => b.rating! - a.rating! || byName(a, b))
+          .map((p) => place(p, `${p.rating!.toFixed(1)} ★`))
+      case 'Most Suggested':
+        return [...stats.places]
+          .sort((a, b) => b.suggested - a.suggested || byName(a, b))
+          .map((p) => place(p, `${p.suggested}×`))
+      case 'Most Vetoed':
+        return stats.places
+          .filter((p) => p.vetoed > 0)
+          .sort((a, b) => b.vetoed - a.vetoed || byName(a, b))
+          .map((p) => place(p, `${p.vetoed}×`))
+      case 'Users':
+        return [...stats.users]
+          .sort((a, b) => b.wins - a.wins || b.suggested - a.suggested || byName(a, b))
+          .map((u) => ({
+            key: u.key,
+            node: <span>{u.name}</span>,
+            value: `${u.sessions} ${u.sessions === 1 ? 'lunch' : 'lunches'} · ${u.suggested} suggested · ${u.wins} ${u.wins === 1 ? 'win' : 'wins'}`,
+          }))
+    }
+  })()
+
+  return (
+    <section className="card">
+      <h3>Session Stats</h3>
+      <div className="history">
+        <ul className="history-list">
+          {STAT_ROWS.map((r) => (
+            <li key={r}>
+              <button
+                type="button"
+                className={r === selected ? 'history-item active' : 'history-item'}
+                onClick={() => setSelected(r)}
+              >
+                <strong>{r}</strong>
+                <span className="muted small">See details →</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="history-detail">
+          <h4>{selected}</h4>
+          {rows.length === 0 && <p className="muted small">Nothing to show yet.</p>}
+          <ul className="avg-list stat-rows">
+            {rows.map((r) => (
+              <li key={r.key}>
+                {r.node}
+                <strong className={selected === 'Users' ? 'small muted' : undefined}>
+                  {r.value}
+                </strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export function StatsPage() {
   const state = useHistory()
 
@@ -136,119 +212,11 @@ export function StatsPage() {
     )
   }
 
-  const { stats } = state
-  const winners = stats.places
-    .filter((p) => p.wins > 0)
-    .sort((a, b) => b.wins - a.wins || b.suggested - a.suggested)
-    .slice(0, 5)
-  const users = [...stats.users].sort(
-    (a, b) => b.sessions - a.sessions || b.suggested - a.suggested,
-  )
-  const topUsers = stats.users
-    .filter((u) => u.wins > 0)
-    .sort((a, b) => b.wins - a.wins || b.suggested - a.suggested)
-    .slice(0, 5)
-  const suggested = [...stats.places].sort((a, b) => b.suggested - a.suggested).slice(0, 5)
-  const vetoed = stats.places
-    .filter((p) => p.vetoed > 0)
-    .sort((a, b) => b.vetoed - a.vetoed)
-    .slice(0, 5)
-  const rated = stats.places
-    .filter((p) => p.rating !== null)
-    .sort((a, b) => b.rating! - a.rating!)
-    .slice(0, 5)
-
   return (
     <div className="stats rise">
       <h1 className="stats-title">Statistics &amp; history</h1>
-
-      <div className="stat-tiles">
-        <div className="card stat-tile">
-          <strong>{stats.finishedSessions}</strong>
-          <span className="muted small">Lunches decided</span>
-        </div>
-        <div className="card stat-tile">
-          <strong>{stats.participants}</strong>
-          <span className="muted small">People</span>
-        </div>
-        <div className="card stat-tile">
-          <strong>{stats.places.length}</strong>
-          <span className="muted small">Different places</span>
-        </div>
-        <div className="card stat-tile">
-          <strong>{stats.reviewCount}</strong>
-          <span className="muted small">Reviews</span>
-        </div>
-      </div>
-
-      <div className="grid-2">
-        <section className="card">
-          <h3>🏆 Most wins</h3>
-          {winners.length === 0 && <p className="muted">No winners yet.</p>}
-          <ul className="avg-list">
-            {winners.map((p) => (
-              <PlaceRow key={p.key} place={p} value={`${p.wins}×`} />
-            ))}
-          </ul>
-        </section>
-        <section className="card">
-          <h3>⭐ Best rated</h3>
-          {rated.length === 0 && <p className="muted">No reviews yet.</p>}
-          <ul className="avg-list">
-            {rated.map((p) => (
-              <PlaceRow key={p.key} place={p} value={`${p.rating!.toFixed(1)} ★`} />
-            ))}
-          </ul>
-        </section>
-        <section className="card">
-          <h3>💡 Most suggested</h3>
-          <ul className="avg-list">
-            {suggested.map((p) => (
-              <PlaceRow key={p.key} place={p} value={`${p.suggested}×`} />
-            ))}
-          </ul>
-        </section>
-        <section className="card">
-          <h3>🚫 Most vetoed</h3>
-          {vetoed.length === 0 && <p className="muted">No vetoes yet.</p>}
-          <ul className="avg-list">
-            {vetoed.map((p) => (
-              <PlaceRow key={p.key} place={p} value={`${p.vetoed}×`} />
-            ))}
-          </ul>
-        </section>
-      </div>
-
-      <div className="grid-2">
-        <section className="card">
-          <h3>🥇 Users with most wins</h3>
-          {topUsers.length === 0 && <p className="muted">No winning suggestions yet.</p>}
-          <ul className="avg-list">
-            {topUsers.map((u) => (
-              <li key={u.key}>
-                <span>{u.name}</span>
-                <strong>{u.wins}×</strong>
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section className="card">
-          <h3>👥 Users</h3>
-          <ul className="avg-list">
-            {users.map((u) => (
-              <li key={u.key}>
-                <span>{u.name}</span>
-                <span className="muted small">
-                  {u.sessions} {u.sessions === 1 ? 'lunch' : 'lunches'} · {u.suggested} suggested ·{' '}
-                  {u.wins} {u.wins === 1 ? 'win' : 'wins'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
-
-      <SessionHistory sessions={stats.sessions} />
+      <SessionHistory sessions={state.stats.sessions} />
+      <SessionStats stats={state.stats} />
     </div>
   )
 }
