@@ -835,7 +835,17 @@ textarea {
   margin-top: 0.25rem;
 }
 .nudge {
-  animation: pulse 1.6s ease-in-out infinite;
+  animation: glow 1.4s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,
+  100% {
+    filter: brightness(0.7);
+  }
+  50% {
+    filter: brightness(1.35);
+    box-shadow: 0 0 18px var(--accent);
+  }
 }
 .actions {
   display: flex;

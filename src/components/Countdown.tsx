@@ -67,7 +67,11 @@ export function Countdown() {
         <span className="muted small progress-note">
           {progress.everyoneDone
             ? isCreator
-              ? "🎉 Everyone's done. You can finish now, or let the timer run."
+              ? `🎉 Everyone's done. ${
+                  phase === 'suggest'
+                    ? 'Veto opens when the timer ends. Tap "Complete now" to move on.'
+                    : 'You can finish now, or let the timer run.'
+                }`
               : `🎉 Everyone's done. Waiting for ${creator?.name ?? 'the creator'} to move on.`
             : `${progress.done} of ${progress.total} finished`}
         </span>
