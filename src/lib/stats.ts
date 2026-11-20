@@ -51,6 +51,7 @@ export interface Stats {
   reviewCount: number
   categoryAverages: Record<RatingKey, number> | null
   recent: SessionSummary[]
+  sessions: SessionDetail[]
 }
 
 export const placeKey = (name: string) => name.trim().toLowerCase()
@@ -173,6 +174,7 @@ export function buildStats(raw: RawHistory, now = Date.now()): Stats {
         ) as Record<RatingKey, number>)
       : null,
     recent: recent.reverse(),
+    sessions: buildSessionDetails(raw, now),
   }
 }
 
@@ -191,4 +193,79 @@ function group<T>(items: T[], key: (item: T) => string): Map<string, T[]> {
 
 function mean(values: number[]): number {
   return values.reduce((a, b) => a + b, 0) / values.length
+}
+
+export interface SessionOptionDetail {
+  name: string
+  url: string | null
+  suggestedBy: string | null
+  vetoedBy: string[]
+  points: number | null
+  rank: number | null
+}
+
+export interface SessionDetail {
+  code: string
+  name: string
+  createdAt: string
+  creator: string | null
+  phase: string
+  participants: string[]
+  options: SessionOptionDetail[]
+  winner: string | null
+  rating: number | null
+  comments: { by: string; text: string }[]
+}
+
+export function buildSessionDetails(raw: RawHistory, now = Date.now()): SessionDetail[] {
+  const nameOf = new Map(raw.participants.map((p) => [p.id, p.name.trim()]))
+  return [...raw.sessions]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .map((s) => {
+      const parts = raw.participants.filter((p) => p.session_id === s.id)
+      const options = raw.options
+        .filter((o) => o.session_id === s.id)
+        .sort((a, b) => a.created_at.localeCompare(b.created_at))
+      const vetoes = raw.vetoes.filter((v) => v.session_id === s.id)
+      const phase = getPhase(s, now)
+      const rows =
+        phase === 'results'
+          ? scoreOptions(
+              survivingOptions(options, vetoes),
+              raw.ballots.filter((b) => b.session_id === s.id),
+              parts.map((p) => p.id),
+            )
+          : []
+      const reviews = raw.reviews.filter((r) => r.session_id === s.id)
+      return {
+        code: s.code,
+        name: s.name,
+        createdAt: s.created_at,
+        creator: parts.find((p) => p.client_id === s.creator_id)?.name.trim() ?? null,
+        phase,
+        participants: parts.map((p) => p.name.trim()),
+        options: options
+          .map((o) => {
+            const idx = rows.findIndex((r) => r.option.id === o.id)
+            return {
+              name: o.name.trim(),
+              url: isValidUrl(o.url) ? o.url!.trim() : null,
+              suggestedBy: nameOf.get(o.participant_id) ?? null,
+              vetoedBy: vetoes
+                .filter((v) => v.option_id === o.id)
+                .map((v) => nameOf.get(v.participant_id) ?? 'Someone'),
+              points: idx >= 0 ? rows[idx].points : null,
+              rank: idx >= 0 ? idx + 1 : null,
+            }
+          })
+          .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99)),
+        winner: rows[0]?.option.name.trim() ?? null,
+        rating: reviews.length
+          ? mean(reviews.map((r) => mean(CATEGORIES.map((c) => r[c.key]))))
+          : null,
+        comments: reviews
+          .filter((r) => r.comment.trim())
+          .map((r) => ({ by: nameOf.get(r.participant_id) ?? 'Someone', text: r.comment.trim() })),
+      }
+    })
 }

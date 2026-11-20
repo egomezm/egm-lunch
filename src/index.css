@@ -952,3 +952,57 @@ textarea {
   font-size: 0.8em;
   font-weight: 400;
 }
+
+/* Session history */
+.history {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) 2fr;
+  gap: 1rem;
+  align-items: start;
+}
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  max-height: 32rem;
+  overflow-y: auto;
+}
+.history-item {
+  width: 100%;
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.history-item.active {
+  border-color: var(--accent);
+}
+.history-detail {
+  background: var(--surface-2);
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+.history-detail h4,
+.history-detail h5 {
+  margin: 0.2rem 0;
+}
+.history-detail h5 {
+  margin-top: 0.9rem;
+}
+.history-comments {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+@media (max-width: 40rem) {
+  .history {
+    grid-template-columns: 1fr;
+  }
+}
