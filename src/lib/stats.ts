@@ -128,6 +128,7 @@ export function buildStats(raw: RawHistory, now = Date.now()): Stats {
     const rows = scoreOptions(
       survivingOptions(options, vetoesBySession.get(s.id) ?? []),
       ballotsBySession.get(s.id) ?? [],
+      raw.participants.filter((p) => p.session_id === s.id).map((p) => p.id),
     )
     const winner = rows[0]?.option
     if (winner) {

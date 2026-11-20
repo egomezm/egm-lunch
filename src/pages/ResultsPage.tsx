@@ -16,11 +16,15 @@ export function ResultsPage() {
   }
 
   const survivors = survivingOptions(options, vetoes)
-  const rows = scoreOptions(survivors, ballots)
+  const rows = scoreOptions(
+    survivors,
+    ballots,
+    participants.map((p) => p.id),
+  )
   const winner = rows[0]
   const out = options.filter((o) => !survivors.some((s) => s.id === o.id))
   const maxPoints = Math.max(1, ...rows.map((r) => r.points))
-  const voters = ballots.filter((b) => b.ranking.some((id) => survivors.some((s) => s.id === id)))
+  const voters = ballots
 
   if (!winner) {
     return (

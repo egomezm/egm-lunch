@@ -66,7 +66,11 @@ export function ReviewsPage() {
     )
   }
 
-  const winner = scoreOptions(survivingOptions(options, vetoes), ballots)[0]
+  const winner = scoreOptions(
+    survivingOptions(options, vetoes),
+    ballots,
+    participants.map((p) => p.id),
+  )[0]
   if (!winner) {
     return (
       <div className="card narrow center rise">

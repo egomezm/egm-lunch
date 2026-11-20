@@ -22,7 +22,22 @@ export function everythingVetoed(options: Option[], vetoes: Veto[]): boolean {
 
 // Borda count: with N survivors, 1st place earns N points and last earns 1.
 // Ties: the option suggested first wins.
-export function scoreOptions(survivors: Option[], ballots: Ballot[]): ScoreRow[] {
+// Participants who never ranked are counted with the order they were shown (suggestion order).
+export function scoreOptions(
+  survivors: Option[],
+  ballots: Ballot[],
+  participantIds: string[] = [],
+): ScoreRow[] {
+  const ranked = new Set(ballots.map((b) => b.participant_id))
+  const defaultOrder = [...survivors]
+    .sort((x, y) => x.created_at.localeCompare(y.created_at) || x.id.localeCompare(y.id))
+    .map((o) => o.id)
+  ballots = [
+    ...ballots,
+    ...participantIds
+      .filter((id) => !ranked.has(id))
+      .map((id) => ({ participant_id: id, session_id: '', ranking: defaultOrder, locked: true })),
+  ]
   const n = survivors.length
   const rows = new Map<string, ScoreRow>(
     survivors.map((option) => [option.id, { option, points: 0, firstPlaces: 0 }]),
