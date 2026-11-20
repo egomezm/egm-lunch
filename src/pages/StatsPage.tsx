@@ -109,7 +109,7 @@ function SessionSummaryView({ session: s }: { session: SessionDetail }) {
 type StatKey = 'Winners' | 'Users' | 'Most Vetoed' | 'Most Suggested' | 'Best Rated'
 const STAT_ROWS: StatKey[] = ['Winners', 'Users', 'Most Vetoed', 'Most Suggested', 'Best Rated']
   .slice()
-  .sort((a, b) => b.localeCompare(a)) as StatKey[]
+  .sort((a, b) => a.localeCompare(b)) as StatKey[]
 
 function SessionStats({ stats }: { stats: Stats }) {
   const [selected, setSelected] = useState<StatKey>(STAT_ROWS[0])
